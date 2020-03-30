@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +14,11 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "Orders")
@@ -27,12 +33,13 @@ public class Orders {
 	@Column(name = "status")
 	private String status;
 
-	@ManyToMany(targetEntity =Product.class,cascade= {CascadeType.ALL})
-	@JoinTable(name ="OrderPro",joinColumns= {@JoinColumn(name="Order_Id")},inverseJoinColumns= {@JoinColumn(name="Product_Id")})
+	@ManyToMany(targetEntity =Product.class /*cascade= {CascadeType.ALL}*/)
+	@JoinTable(name ="OrderPro",joinColumns= {@JoinColumn(name="order_Id")},inverseJoinColumns= {@JoinColumn(name="pro_Id")})
 	private List<Product> products;
 
-	@ManyToOne
-	@JoinColumn(name="order_id", nullable=false,insertable=false,updatable=false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="customer_id", nullable=false)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Customer customer;
 
 	@Column(name = "noOfInstallments")
@@ -70,10 +77,12 @@ public class Orders {
 		this.products = products;
 	}
 
+	@JsonIgnore
 	public Customer getCustomer() {
 		return customer;
 	}
 
+	@JsonIgnore
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
@@ -102,7 +111,11 @@ public class Orders {
 		this.outstandingBal = outstandingBal;
 	}
 
-
+     
+	public int getCustomer_id()
+	{
+		return customer.getCustomerId();
+	}
 
 
 

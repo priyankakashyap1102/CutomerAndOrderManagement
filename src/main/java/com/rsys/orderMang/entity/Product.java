@@ -29,8 +29,8 @@ public class Product {
 	@Column(name = "price")
 	private float price;
 	
-	@ManyToMany(mappedBy="products")
-	private List<Orders> orders;
+/*	@ManyToMany(mappedBy="products")
+	private List<Orders> orders;*/
 	
 	
 	public int getProId() {
@@ -65,13 +65,6 @@ public class Product {
 		this.price = price;
 	}
 
-	public List<Orders> getOrders() {
-		return orders;
-	}
-
-	public void setOrders(List<Orders> orders) {
-		this.orders = orders;
-	}
 	
 	
 	
