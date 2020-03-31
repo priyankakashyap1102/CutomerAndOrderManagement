@@ -27,8 +27,8 @@ public class Customer {
 	@Column(name = "customer_name")
 	private String customerName;
 
-	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private Set<Orders> oredrs = new HashSet<>();
+	/*@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private Set<Orders> oredrs = new HashSet<>();*/
 
 	
 
@@ -47,17 +47,6 @@ public class Customer {
 	public void setCustomerName(String customerName) {
 		this.customerName = customerName;
 	}
-
-	public Set<Orders> getOredrs() {
-		return oredrs;
-	}
-
-	public void setOredrs(Set<Orders> oredrs) {
-		this.oredrs = oredrs;
-	}
-
-	
-
 	
 
 }

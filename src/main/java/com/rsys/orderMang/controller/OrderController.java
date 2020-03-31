@@ -1,12 +1,16 @@
 package com.rsys.orderMang.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.rsys.orderMang.dto.OrderDto;
 import com.rsys.orderMang.entity.Orders;
 import com.rsys.orderMang.repo.OrderRepository;
 import com.rsys.orderMang.response.ResponseData;
@@ -37,6 +41,18 @@ public class OrderController {
 		
 		return new ResponseData("200",msg,output);
 		
+	}
+	
+	@GetMapping
+	public ResponseData getOrders()
+	{
+		List<OrderDto> orderDto=iOrderService.getOrders();
+		if(orderDto==null)
+		{
+			throw new NullPointerException();
+		}
+		
+		return new ResponseData("200",msg,orderDto);
 	}
 	
 	
