@@ -1,5 +1,6 @@
 package com.rsys.orderMang.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -13,12 +14,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "Orders")
@@ -29,15 +32,19 @@ public class Orders {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int orderId;
 
-
 	@Column(name = "status")
 	private String status;
 
-	@ManyToMany(targetEntity =Product.class /*cascade= {CascadeType.ALL}*/)
+	@ManyToMany(targetEntity =Product.class,cascade= {CascadeType.ALL})
 	@JoinTable(name ="OrderPro",joinColumns= {@JoinColumn(name="order_Id")},inverseJoinColumns= {@JoinColumn(name="pro_Id")})
 	private List<Product> products;
+	
+	/*@OneToMany(cascade = CascadeType.ALL )
+	@JoinColumn(name="order_id")
+	private List<OrderProduct> orderPro=new ArrayList<OrderProduct>();*/
+	
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(/*fetch = FetchType.LAZY*/)
 	@JoinColumn(name="customer_id", nullable=false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Customer customer;
@@ -68,14 +75,6 @@ public class Orders {
 		this.status = status;
 	}
 
-	
-	public List<Product> getProducts() {
-		return products;
-	}
-
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
 
 	@JsonIgnore
 	public Customer getCustomer() {
@@ -111,11 +110,23 @@ public class Orders {
 		this.outstandingBal = outstandingBal;
 	}
 
-     
+
 	public int getCustomer_id()
 	{
 		return customer.getCustomerId();
 	}
+
+	public List<Product> getProducts() {
+		return products;
+	}
+
+	public void setProducts(List<Product> products) {
+		this.products = products;
+	}
+
+	
+	
+	
 
 
 

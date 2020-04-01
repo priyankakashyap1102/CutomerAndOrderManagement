@@ -33,7 +33,7 @@ public class OrdersServiceImpl implements IOrderService {
 
 	@Autowired
 	IProductService proService;
-	
+
 	@Autowired
 	ProductRepository proRepo;
 
@@ -41,51 +41,50 @@ public class OrdersServiceImpl implements IOrderService {
 	public List<Orders> getAllOrders() {
 		return orderRepo.findAll();
 	}
-	
-	
+
+
 	@Override
 	public List<OrderDto> getOrders() {
-     
+
 		List<Orders> allOrders=orderRepo.findAll();
-		Optional<Orders> ids=null;
-		List<Integer> products=new ArrayList<>();
-		OrderDto orderDto=new OrderDto();
+		
+		
 		List<OrderDto> dtos=new ArrayList<>();
+
 		for(Orders o:allOrders)
 		{
-			ids=orderRepo.findById(o.getOrderId());
+			OrderDto orderDto=new OrderDto();
 			orderDto.setOrderId(o.getOrderId());
 			orderDto.setNoOfInstallments(o.getNoOfInstallments());
 			orderDto.setOutstandingBal(o.getOutstandingBal());
 			orderDto.setStatus(o.getStatus());
 			orderDto.setTotalPrice(o.getTotalPrice());
-			//orderDto.setCustomer(o.getCustomer());
-			
-		}
-		Orders order=ids.get();
-		products=orderRepo.findProductId(order.getOrderId());
+			orderDto.setCustomer(o.getCustomer());						
 		
-		
-		List<Product> productDetails=new ArrayList<>();
-		for(Integer p:products)
-		{
-		
-		productDetails=proRepo.getAllByproId(p);
-		}
-		
-		ProductDto productDto=new ProductDto();
-		List<ProductDto> pDto=new ArrayList<>();
-		for(Product p1:productDetails)
-		{
-			productDto.setpId(p1.getProId());
-			productDto.setQuantity(p1.getQuantity());
-			productDto.setpName(p1.getProName());
-			
-		}
-		pDto.add(productDto);
-		orderDto.setProduct(pDto);
-		dtos.add(orderDto);
-				
+			List<Integer> products=new ArrayList<>();
+			products=orderRepo.findProductId(o.getOrderId());
+			List<Product> productDetails=new ArrayList<>();
+			for(Integer p:products)
+			{
+				Product product =proRepo.getOne(p);
+				productDetails.add(product);
+
+			}
+
+			ProductDto productDto=new ProductDto();
+			List<ProductDto> pDto=new ArrayList<>();
+			for(Product p1:productDetails)
+			{
+				productDto.setpId(p1.getProId());
+				productDto.setQuantity(p1.getQuantity());
+				productDto.setpName(p1.getProName());
+				pDto.add(productDto);
+
+			}
+
+			orderDto.setProduct(pDto);
+			dtos.add(orderDto);
+		}		
 		return dtos;
 	}
 
@@ -130,12 +129,10 @@ public class OrdersServiceImpl implements IOrderService {
 				}
 				else
 				{
-
 					tquan=quan-quantity;
 					p.setQuantity(tquan);
 					proService.updateProduct(p);
 				}
-
 			}
 			if(flag==0)
 			{
@@ -156,20 +153,39 @@ public class OrdersServiceImpl implements IOrderService {
 	}
 
 	@Override
-	public String updateOrders(Orders product) {
-		return null;
+	@Transactional
+	public String updateOrders(int orderId,Orders orders) {
+		
+		Orders order=orderRepo.getOne(orderId);
+		order.setStatus(orders.getStatus());
+		if(order.getStatus().equalsIgnoreCase("close"))
+		{
+			order.setOutstandingBal(0.00f);
+			order.setNoOfInstallments(0);
+		}
+		
+		orderRepo.save(order);
+		String output="Order Updated!";
+		
+		/*List<Product> products=orders.getProducts();
+		
+		
+		for(Product p: products)
+		{
+			
+		}*/		
+		return output;
 	}
+
 
 	@Override
-	public String deleteAllOrders() {
-		return null;
+	public String deleteOneOrder(int orderId) {
+		
+		orderRepo.deleteById(orderId);
+		
+		return "Deleted Successfully";
 	}
 
-	@Override
-	public String deleteOneOrder(int proId) {
-		return null;
-	}
 
-	
 
 }

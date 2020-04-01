@@ -15,9 +15,7 @@ public interface IOrderService {
 	
 	String addOrders(int customerId,Orders order);
 
-	String updateOrders(Orders order);
-
-	String deleteAllOrders();
+	String updateOrders(int orderId,Orders order);
 	
 	String deleteOneOrder(int orderId);
 

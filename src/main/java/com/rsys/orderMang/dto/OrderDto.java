@@ -2,11 +2,10 @@ package com.rsys.orderMang.dto;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.rsys.orderMang.entity.Customer;
 
 
-@JsonSerialize
+
 public class OrderDto {
 
 	private int orderId;
