@@ -1,4 +1,4 @@
-/*package com.rsys.orderMang.entity;
+package com.rsys.orderMang.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -42,4 +42,3 @@ public class OrderProduct {
 		this.quantity = quantity;
 	}
 }
-*/

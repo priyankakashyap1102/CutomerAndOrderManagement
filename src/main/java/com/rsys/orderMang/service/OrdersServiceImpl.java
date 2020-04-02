@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import com.rsys.orderMang.dto.OrderDto;
 import com.rsys.orderMang.dto.ProductDto;
 import com.rsys.orderMang.entity.Customer;
+import com.rsys.orderMang.entity.OrderProduct;
 import com.rsys.orderMang.entity.Orders;
 import com.rsys.orderMang.entity.Product;
 import com.rsys.orderMang.repo.CustomerRepository;
+import com.rsys.orderMang.repo.OrderProductRepository;
 import com.rsys.orderMang.repo.OrderRepository;
 import com.rsys.orderMang.repo.ProductRepository;
 
@@ -36,6 +38,9 @@ public class OrdersServiceImpl implements IOrderService {
 
 	@Autowired
 	ProductRepository proRepo;
+	
+	@Autowired
+	OrderProductRepository orderProRepo;
 
 	@Override
 	public List<Orders> getAllOrders() {
@@ -47,8 +52,6 @@ public class OrdersServiceImpl implements IOrderService {
 	public List<OrderDto> getOrders() {
 
 		List<Orders> allOrders=orderRepo.findAll();
-		
-		
 		List<OrderDto> dtos=new ArrayList<>();
 
 		for(Orders o:allOrders)
@@ -61,25 +64,15 @@ public class OrdersServiceImpl implements IOrderService {
 			orderDto.setTotalPrice(o.getTotalPrice());
 			orderDto.setCustomer(o.getCustomer());						
 		
-			List<Integer> products=new ArrayList<>();
-			products=orderRepo.findProductId(o.getOrderId());
-			List<Product> productDetails=new ArrayList<>();
-			for(Integer p:products)
-			{
-				Product product =proRepo.getOne(p);
-				productDetails.add(product);
-
-			}
-
 			ProductDto productDto=new ProductDto();
 			List<ProductDto> pDto=new ArrayList<>();
-			for(Product p1:productDetails)
+			List<OrderProduct> op=orderProRepo.getByOderid(o.getOrderId());
+			for(OrderProduct i: op)
 			{
-				productDto.setpId(p1.getProId());
-				productDto.setQuantity(p1.getQuantity());
-				productDto.setpName(p1.getProName());
-				pDto.add(productDto);
-
+			productDto.setpId(i.getProId());
+			productDto.setQuantity(i.getQuantity());
+			productDto.setpName(i.getProName());
+			pDto.add(productDto);
 			}
 
 			orderDto.setProduct(pDto);
@@ -89,21 +82,22 @@ public class OrdersServiceImpl implements IOrderService {
 	}
 
 	@Override
-	@Transactional
 	public String addOrders(int customerId,Orders order) {
 		String output="";
 		float price=0;
 		int quantity=0,quan=0,tquan=0;
 		int sum=0;
 		float tPrice=0;
+		List<OrderProduct> orderPro=new ArrayList<>();
 		Orders orders=new Orders();
+		OrderProduct orderProduct=new OrderProduct();
 		Optional<Customer> byId = customerRepo.findById(customerId);
 		if (!byId.isPresent()) {
 			throw new NullPointerException();
 		}
-		List<Product> pIds=order.getProducts();
+		List<OrderProduct> pIds=order.getOrderPro();
 
-		for(Product p1:pIds)
+		for(OrderProduct p1:pIds)
 		{
 			quantity=p1.getQuantity();
 			sum=sum+quantity;
@@ -115,11 +109,12 @@ public class OrdersServiceImpl implements IOrderService {
 		else
 		{
 			int flag =0;
-			for(Product p:pIds)
+			for(OrderProduct p:pIds)
 			{
 				quantity=p.getQuantity();
-				price=orderRepo.getPrice(p.getProId());
-				quan=orderRepo.getTotalQuantity(p.getProId());
+				Product prt = proRepo.getOne(p.getProId());
+				price=prt.getPrice();
+				quan=prt.getQuantity();
 				tPrice=tPrice+(price*quantity);
 				if(quan==0 || (quan<quantity))
 				{
@@ -130,19 +125,20 @@ public class OrdersServiceImpl implements IOrderService {
 				else
 				{
 					tquan=quan-quantity;
-					p.setQuantity(tquan);
-					proService.updateProduct(p);
+					prt.setQuantity(tquan);
+					proService.updateProduct(prt);
 				}
 			}
 			if(flag==0)
 			{
 				Customer cust=byId.get();
 				orders.setCustomer(cust);
-				orders.setProducts(order.getProducts());
 				orders.setTotalPrice(tPrice);
 				orders.setStatus("open");
 				orders.setNoOfInstallments(order.getNoOfInstallments());
 				orders.setOutstandingBal(tPrice);
+				orderPro.add(orderProduct);				
+				orders.setOrderPro(orderPro);
 				orderRepo.save(orders);
 				output="Order details Added";
 			}
@@ -152,29 +148,87 @@ public class OrdersServiceImpl implements IOrderService {
 		return output;
 	}
 
+
 	@Override
 	@Transactional
-	public String updateOrders(int orderId,Orders orders) {
+	public String updateOrders(int orderId,int customerId,Orders orders) {/*
 		
+		String output="";
 		Orders order=orderRepo.getOne(orderId);
-		order.setStatus(orders.getStatus());
-		if(order.getStatus().equalsIgnoreCase("close"))
-		{
-			order.setOutstandingBal(0.00f);
-			order.setNoOfInstallments(0);
+		List<OrderProduct> prevProduct=order.getOrderPro();
+		List<OrderProduct> newProduct=orders.getOrderPro();
+		
+		Optional<Customer> byId = customerRepo.findById(customerId);
+		if (!byId.isPresent()) {
+			throw new NullPointerException();
 		}
 		
-		orderRepo.save(order);
-		String output="Order Updated!";
+		int newQuantity=0,sum=0,oldQuantity=0,tquan=0,quan=0;
+		float price=0;
 		
-		/*List<Product> products=orders.getProducts();
+		for(OrderProduct newOrderPro:newProduct)
+		{
+			newQuantity=newOrderPro.getQuantity();
+			sum=sum+newQuantity;
+		}
+		if(sum>5)
+		{
+			output="Only 5 qunatity can be added!";
+		}
+		else
+		{
+			int flag=0;
+			for(OrderProduct prevOrderPro: prevProduct)
+			{
+				oldQuantity=prevOrderPro.getQuantity();
+				Product prt = proRepo.getOne(prevOrderPro.getProId());
+				quan=prt.getQuantity();
+				price=prt.getPrice();
+				if(newQuantity==0)
+				{
+					flag=1;
+					//orderProRepo.deleteById(prevOrderPro.getProId());
+					break;
+				}
+				else
+				{
+				if(newQuantity<oldQuantity)
+				{					
+					tquan=quan+(oldQuantity-newQuantity);
+					prt.setQuantity(tquan);
+					proService.updateProduct(prt);					
+				}
+				else
+				{
+					tquan=quan-(newQuantity-oldQuantity);
+					prt.setQuantity(tquan);
+					proService.updateProduct(prt);	
+				}
+				}
+			}
+			if(flag==0)
+			{
+				Customer cust=byId.get();
+				order.setCustomer(cust);
+				order.setTotalPrice(tPrice);
+				order.setStatus("open");
+				order.setNoOfInstallments(order.getNoOfInstallments());
+				order.setOutstandingBal(tPrice);
+				orderPro.add(orderProduct);				
+				order.setOrderPro(orderPro);
+				orderRepo.save(order);
+				output="Order details Added";
+			}
+			
+			
+		}
 		
 		
-		for(Product p: products)
 		{
 			
-		}*/		
-		return output;
+		}
+		*/	
+		return null;
 	}
 
 

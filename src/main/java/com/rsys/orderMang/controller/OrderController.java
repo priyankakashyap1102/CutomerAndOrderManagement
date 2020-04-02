@@ -2,6 +2,8 @@ package com.rsys.orderMang.controller;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,10 +59,10 @@ public class OrderController {
 		return new ResponseData("200",msg,orderDto);
 	}
 	
-	@PutMapping(value="/{orderId}")
-	public ResponseData updateOrderDetails(@PathVariable(value = "orderId") int orderId,@RequestBody Orders order)
+	@PutMapping(value="/{orderId}/{customerId}")
+	public ResponseData updateOrderDetails(@PathVariable(value = "orderId") int orderId, @PathVariable(value = "customerId") int customerId,@RequestBody Orders order)
 	{
-		String output=iOrderService.updateOrders(orderId, order);
+		String output=iOrderService.updateOrders(orderId,customerId, order);
 		if(output==null)
 		{
 			throw new NullPointerException();

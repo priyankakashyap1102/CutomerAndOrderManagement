@@ -35,13 +35,14 @@ public class Orders {
 	@Column(name = "status")
 	private String status;
 
-	@ManyToMany(targetEntity =Product.class,cascade= {CascadeType.ALL})
+	/*@ManyToMany(targetEntity= Product.class,cascade= {CascadeType.MERGE,
+            CascadeType.REFRESH})
 	@JoinTable(name ="OrderPro",joinColumns= {@JoinColumn(name="order_Id")},inverseJoinColumns= {@JoinColumn(name="pro_Id")})
-	private List<Product> products;
+	private List<Product> products;*/
 	
-	/*@OneToMany(cascade = CascadeType.ALL )
+	@OneToMany(cascade = CascadeType.ALL )
 	@JoinColumn(name="order_id")
-	private List<OrderProduct> orderPro=new ArrayList<OrderProduct>();*/
+	private List<OrderProduct> orderPro=new ArrayList<OrderProduct>();
 	
 
 	@ManyToOne(/*fetch = FetchType.LAZY*/)
@@ -116,14 +117,22 @@ public class Orders {
 		return customer.getCustomerId();
 	}
 
-	public List<Product> getProducts() {
+	public List<OrderProduct> getOrderPro() {
+		return orderPro;
+	}
+
+	public void setOrderPro(List<OrderProduct> orderPro) {
+		this.orderPro = orderPro;
+	}
+
+	/*public List<Product> getProducts() {
 		return products;
 	}
 
 	public void setProducts(List<Product> products) {
 		this.products = products;
 	}
-
+*/
 	
 	
 	
