@@ -23,17 +23,15 @@ public class ProductServiceImpl implements IProductService {
 	}
 
 	@Override
-	public String addItemToProduct(Product productObj) {
+	public Product addItemToProduct(Product productObj) {
 
-		String output="";
 		Product product=new Product();
 		product.setPrice(productObj.getPrice());
 		product.setProName(productObj.getProName());
 		product.setQuantity(productObj.getQuantity());
-		proRepo.save(product);
-		output="Product Added Sucessfully";
+		
 
-		return output;
+		return proRepo.save(product);
 	}
 
 	@Override

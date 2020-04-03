@@ -10,7 +10,7 @@ public interface IProductService {
 	List<Product> getAllProduct();
 
 
-	String addItemToProduct(Product productObj);
+	Product addItemToProduct(Product productObj);
 
 	String updateProduct(Product product);
 

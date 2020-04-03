@@ -4,13 +4,16 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.CustomAutowireConfigurer;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rsys.orderMang.dao.CustomerDao;
+import com.rsys.orderMang.dto.CustomerDto;
 import com.rsys.orderMang.entity.Customer;
 import com.rsys.orderMang.entity.Product;
 import com.rsys.orderMang.repo.CustomerRepository;
@@ -33,7 +36,22 @@ public class CustomerController {
 	public ResponseData addCustomer(@RequestBody Customer customer)
 	{
 		
-		String output=customerService.addNewCustomer(customer);
+		Customer customers=customerService.addNewCustomer(customer);
+		if(customer==null)
+		{
+			throw new NullPointerException();
+		}
+		
+		return new ResponseData("200",msg,customers);
+		
+	}
+	
+	@GetMapping
+	public ResponseData getCustomerDetails()
+	{
+		
+		List<CustomerDto> output=customerService.getAllCustomer();
+		
 		if(output==null)
 		{
 			throw new NullPointerException();
@@ -43,12 +61,10 @@ public class CustomerController {
 		
 	}
 	
-	@GetMapping
-	public ResponseData getCustomerDetails()
+	@PutMapping(value = "/{orderId}")
+	public ResponseData updateCustomers(@PathVariable(value = "orderId") int orderId)
 	{
-		
-		List<CustomerDao> output=customerService.getAllCustomer();
-		
+		String output=customerService.updateCustomerDetails(orderId);
 		if(output==null)
 		{
 			throw new NullPointerException();
@@ -56,7 +72,24 @@ public class CustomerController {
 		
 		return new ResponseData("200",msg,output);
 		
+		
 	}
+	
+	@DeleteMapping
+	public ResponseData deleteAllCustomers()
+	{
+		String output=customerService.deleteAllCustomers();
+		if(output==null)
+		{
+			throw new NullPointerException();
+		}
+		
+		return new ResponseData("200",msg,output);
+		
+		
+	}
+	
+	
 	
 
 }

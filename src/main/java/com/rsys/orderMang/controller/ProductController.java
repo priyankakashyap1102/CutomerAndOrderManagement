@@ -36,13 +36,13 @@ public class ProductController {
 	public ResponseData addProduct(@RequestBody Product product)
 	{
 		
-		String output=productService.addItemToProduct(product);
-		if(output==null)
+		Product pro=productService.addItemToProduct(product);
+		if(pro==null)
 		{
 			throw new NullPointerException();
 		}
 		
-		return new ResponseData("200",msg,output);
+		return new ResponseData("200",msg,pro);
 		
 	}
 	

@@ -2,16 +2,20 @@ package com.rsys.orderMang.service;
 
 import java.util.List;
 
-import com.rsys.orderMang.dao.CustomerDao;
+import com.rsys.orderMang.dto.CustomerDto;
 import com.rsys.orderMang.entity.Customer;
 
 
 public interface ICustomerService {
 	
-	List<CustomerDao> getAllCustomer();
-	String addNewCustomer(Customer cust);
+	List<CustomerDto> getAllCustomer();
+	Customer addNewCustomer(Customer cust);
 
-	String updateCustomerDetails(Customer cust);
+	String updateCustomerDetails(int orderId);
+	
+	String deleteAllCustomers();
+	
+	
 	
 	
 

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.rsys.orderMang.dao.CustomerDao;
+import com.rsys.orderMang.dto.CustomerDto;
 import com.rsys.orderMang.entity.Customer;
 import com.rsys.orderMang.entity.Orders;
 
