@@ -11,6 +11,8 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rsys.orderMang.ExceptionHandler.OrderIsEmptyException;
+import com.rsys.orderMang.ExceptionHandler.ProductNotFoundException;
 import com.rsys.orderMang.dto.OrderDto;
 import com.rsys.orderMang.dto.ProductDto;
 import com.rsys.orderMang.entity.Customer;
@@ -83,15 +85,12 @@ public class OrdersServiceImpl implements IOrderService {
 		int quantity = 0, quan = 0, tquan = 0;
 		int sum = 0;
 		float tPrice = 0;
-		List<OrderProduct> orderPro = new ArrayList<>();
 		Orders orders = new Orders();
-		OrderProduct orderProduct = new OrderProduct();
 		Optional<Customer> byId = customerRepo.findById(customerId);
 		if (!byId.isPresent()) {
-			throw new NullPointerException();
+			throw new OrderIsEmptyException("Please Provide valid customerId");
 		}
 		List<OrderProduct> pIds = order.getOrderPro();
-
 		for (OrderProduct p1 : pIds) {
 			quantity = p1.getQuantity();
 			sum = sum + quantity;
@@ -136,23 +135,26 @@ public class OrdersServiceImpl implements IOrderService {
 
 	@Override
 	@Transactional
-	public String updateOrders(int orderId, int customerId, Orders orders) {
+	public Orders updateOrders(int orderId, int customerId, Orders orders) {
+		
 
-		String output = "";
-		Orders order = orderRepo.getOne(orderId);
-		OrderProduct orderProduct = new OrderProduct();
-		List<OrderProduct> orderPro = new ArrayList<>();
+		Optional<Orders> oId = orderRepo.findById(orderId);
+		if(!oId.isPresent())
+		{
+			throw new OrderIsEmptyException("Please Provide valid orderId");
+		}
+		Orders order = oId.get();
 		List<OrderProduct> prevProduct = order.getOrderPro();
 		List<OrderProduct> newProduct = orders.getOrderPro();
 
 		Optional<Customer> byId = customerRepo.findById(customerId);
+		
 		if (!byId.isPresent()) {
-			throw new NullPointerException();
+			throw new OrderIsEmptyException("Please Provide valid  customerId");
 		}
-
+		
 		int newQuantity = 0, oldQuantity = 0, tquan = 0, quan = 0;
 		float price = 0, tprice = 0;
-		int flag = 0;
 		for (OrderProduct prevOrderPro : prevProduct) {
 
 			for (OrderProduct newOrderPro : newProduct) {
@@ -166,7 +168,6 @@ public class OrdersServiceImpl implements IOrderService {
 					tprice = tprice +(newQuantity * price);
 
 					if (newQuantity == 0) {
-						flag = 1;
 						// orderProRepo.deleteById(prevOrderPro.getProId());
 						break;
 					} else {
@@ -195,17 +196,19 @@ public class OrdersServiceImpl implements IOrderService {
 		order.setStatus("open");
 		order.setNoOfInstallments(5);
 		order.setOutstandingBal(tprice);
-		orderRepo.save(order);
-		output = "Order details Updated";
 
-		return output;
+		return orderRepo.save(order);
 	}
 
 	@Override
 	public String deleteOneOrder(int orderId) {
-
+		
+		Orders order = orderRepo.getOne(orderId);
+		if(order==null)
+		{
+			throw new OrderIsEmptyException("Please Provide valid  orderId");			
+		}
 		orderRepo.deleteById(orderId);
-
 		return "Deleted Successfully";
 	}
 

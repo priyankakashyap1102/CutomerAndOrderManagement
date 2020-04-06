@@ -10,13 +10,6 @@ import javax.persistence.Table;
 @Table(name = "OrderProduct")
 public class OrderProduct {
 
-	public int getId() {
-		return id;
-	}
-	public void setId(int id) {
-		this.id = id;
-	}
-	////int orderId;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	int id;
@@ -25,7 +18,12 @@ public class OrderProduct {
 	int quantity;
 
 
-
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public OrderProduct() {
 		super();
 	}

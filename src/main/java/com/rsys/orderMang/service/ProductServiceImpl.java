@@ -1,12 +1,14 @@
 package com.rsys.orderMang.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rsys.orderMang.ExceptionHandler.OrderIsEmptyException;
 import com.rsys.orderMang.entity.Product;
 import com.rsys.orderMang.repo.ProductRepository;
 
@@ -29,8 +31,7 @@ public class ProductServiceImpl implements IProductService {
 		product.setPrice(productObj.getPrice());
 		product.setProName(productObj.getProName());
 		product.setQuantity(productObj.getQuantity());
-		
-
+	
 		return proRepo.save(product);
 	}
 
@@ -64,6 +65,10 @@ public class ProductServiceImpl implements IProductService {
 		@Override
 		public String deleteOneProduct(int proId) {
 
+			Optional<Product> byId = proRepo.findById(proId);
+			if (!byId.isPresent()) {
+				throw new OrderIsEmptyException("Please Provide valid productId");
+			}
 			proRepo.deleteById(proId);
 			return "Deleted Successfully";
 		}

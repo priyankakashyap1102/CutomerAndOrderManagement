@@ -2,10 +2,13 @@ package com.rsys.orderMang.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.rsys.orderMang.ExceptionHandler.CustomerIsEmptyException;
+import com.rsys.orderMang.ExceptionHandler.OrderIsEmptyException;
 import com.rsys.orderMang.dto.CustomerDto;
 import com.rsys.orderMang.entity.Customer;
 import com.rsys.orderMang.entity.Orders;
@@ -53,12 +56,11 @@ public class CustomerServiceImpl implements ICustomerService {
 	@Override
 	public String updateCustomerDetails(int orderId) {
 		String output="";
-		
-		//Customer customers=custRepo.getOne(customerId);
+		Optional<Orders> byId = orderRepo.findById(orderId);
+		if (!byId.isPresent()) {
+			throw new OrderIsEmptyException("Please Provide valid orderId");
+		}		
 		orderRepo.deleteById(orderId);
-		
-		
-		//custRepo.save(cust);
 		output="Customer Updated";
 		return output;
 	}

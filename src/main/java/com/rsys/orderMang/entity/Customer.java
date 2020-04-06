@@ -1,18 +1,11 @@
 package com.rsys.orderMang.entity;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,13 +17,8 @@ public class Customer {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int customerId;
 	
-	@Column(name = "customer_name")
+	@Column(name = "customer_name",nullable=false)
 	private String customerName;
-
-	/*@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
-    private Set<Orders> oredrs = new HashSet<>();*/
-
-	
 
 	public int getCustomerId() {
 		return customerId;

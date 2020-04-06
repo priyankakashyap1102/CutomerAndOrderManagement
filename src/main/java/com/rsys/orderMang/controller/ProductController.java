@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import com.rsys.orderMang.ExceptionHandler.ProductNotFoundException;
 import com.rsys.orderMang.entity.Product;
 import com.rsys.orderMang.repo.ProductRepository;
 import com.rsys.orderMang.response.ResponseData;
@@ -35,11 +36,14 @@ public class ProductController {
 	@PostMapping
 	public ResponseData addProduct(@RequestBody Product product)
 	{
+		Optional<Product> proName=productRepository.findByproName(product.getProName());
+		if(proName.isPresent())
+		throw new ProductNotFoundException("Product is already present in the inventory");
 		
 		Product pro=productService.addItemToProduct(product);
-		if(pro==null)
+		if(pro.getProName()==null || pro.getPrice()==0 || pro.getQuantity()==0)
 		{
-			throw new NullPointerException();
+			throw new ProductNotFoundException("Please provide product details");
 		}
 		
 		return new ResponseData("200",msg,pro);
@@ -52,7 +56,7 @@ public class ProductController {
 		List<Product> product=productService.getAllProduct();
 		if(product==null)
 		{
-			throw new NullPointerException();
+			throw new ProductNotFoundException("Product Not Found");
 		}
 		
 		return new ResponseData("200",msg,product);
@@ -65,7 +69,7 @@ public class ProductController {
 		Optional<Product> pro=productRepository.findById(product.getProId());
 		
 		if(!pro.isPresent())
-			throw new NullPointerException();
+			throw new ProductNotFoundException("Product id not present");
 		
 		String output=productService.updateProduct(product);		
 		return new ResponseData("200",msg,output);
