@@ -26,6 +26,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Entity
 @Table(name = "Orders")
 public class Orders {
+	
+	public Orders() {
+		super();
+	}
 
 	@Id
 	@Column(name = "order_id")

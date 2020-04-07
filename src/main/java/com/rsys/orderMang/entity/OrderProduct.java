@@ -17,6 +17,9 @@ public class OrderProduct {
 	String proName;
 	int quantity;
 
+	public OrderProduct() {
+		super();
+	}
 
 	public int getId() {
 		return id;
@@ -24,9 +27,7 @@ public class OrderProduct {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public OrderProduct() {
-		super();
-	}
+	
 	public int getProId() {
 		return proId;
 	}

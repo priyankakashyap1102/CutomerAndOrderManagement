@@ -16,8 +16,9 @@ public class OrderDto {
 	private float totalPrice;
 	private float outstandingBal;
 
-
-
+	public OrderDto() {
+		super();
+	}
 	public int getOrderId() {
 		return orderId;
 	}
