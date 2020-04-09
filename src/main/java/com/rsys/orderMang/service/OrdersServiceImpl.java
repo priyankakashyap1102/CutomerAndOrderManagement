@@ -1,18 +1,19 @@
 package com.rsys.orderMang.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import com.rsys.orderMang.ExceptionHandler.OrderIsEmptyException;
-import com.rsys.orderMang.ExceptionHandler.ProductNotFoundException;
+
 import com.rsys.orderMang.dto.OrderDto;
 import com.rsys.orderMang.dto.ProductDto;
 import com.rsys.orderMang.entity.Customer;
@@ -27,6 +28,7 @@ import com.rsys.orderMang.repo.ProductRepository;
 @Service
 public class OrdersServiceImpl implements IOrderService {
 
+	
 	@Autowired
 	OrderRepository orderRepo;
 

@@ -32,7 +32,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 
 @RunWith(SpringRunner.class)
@@ -49,8 +48,6 @@ public class OrderControllerTest {
 	@MockBean
 	private IOrderService iOrderService;
 
-	/*@InjectMocks
-	OrderController controller;*/
 
 	Orders order;
 	Orders order1=new Orders();

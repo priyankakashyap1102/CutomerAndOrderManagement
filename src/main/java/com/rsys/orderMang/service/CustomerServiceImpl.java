@@ -49,7 +49,7 @@ public class CustomerServiceImpl implements ICustomerService {
 	public Customer addNewCustomer(Customer cust) {
 		Customer customer=new Customer();
 		customer.setCustomerName(cust.getCustomerName());
-		custRepo.save(cust);
+		//custRepo.save(cust);
 		return custRepo.save(cust);
 	}
 
