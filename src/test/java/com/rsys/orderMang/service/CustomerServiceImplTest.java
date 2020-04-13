@@ -3,9 +3,11 @@ package com.rsys.orderMang.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +23,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.rsys.orderMang.dto.CustomerDto;
 import com.rsys.orderMang.entity.Customer;
+import com.rsys.orderMang.entity.Orders;
 import com.rsys.orderMang.repo.CustomerRepository;
 import com.rsys.orderMang.repo.OrderRepository;
 
@@ -78,6 +81,25 @@ public class CustomerServiceImplTest {
 		Assertions.assertEquals(expected, cust);
 	}
 	
+	@Test
+	public void testUpdateCustomerDetails()throws Exception
+	{
+		Orders order=new Orders();
+		order.setOrderId(1);
+		Optional<Orders> byId=Optional.of(order);
+		Mockito.when(orderRepo.findById(Mockito.anyInt())).thenReturn(byId);
+		String expected=serviceImpl.updateCustomerDetails(1);
+		Assertions.assertEquals(expected,"Customer Updated");
+	}
+	
+	@Test
+	public void testDeleteCustomer()throws Exception
+	{
+		String actual="Deleted!";
+		String expected=serviceImpl.deleteAllCustomers();
+		Assertions.assertEquals(expected,actual);
+		
+	}
 	
 
 }

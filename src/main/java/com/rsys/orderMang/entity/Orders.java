@@ -44,7 +44,7 @@ public class Orders {
 	@JoinTable(name ="OrderPro",joinColumns= {@JoinColumn(name="order_Id")},inverseJoinColumns= {@JoinColumn(name="pro_Id")})
 	private List<Product> products;*/
 	
-	@OneToMany(cascade= {CascadeType.ALL})
+	@OneToMany(cascade= {CascadeType.ALL},orphanRemoval=true)
 	@JoinColumn(name="order_id")
 	private List<OrderProduct> orderPro=new ArrayList<OrderProduct>();
 	

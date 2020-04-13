@@ -122,6 +122,9 @@ public class OrdersServiceImpl implements IOrderService {
 				orders.setCustomer(cust);
 				orders.setTotalPrice(tPrice);
 				orders.setStatus("open");
+				if(order.getNoOfInstallments()>5)
+				throw new OrderIsEmptyException("Only five installments Allowed");
+				else
 				orders.setNoOfInstallments(order.getNoOfInstallments());
 				orders.setOutstandingBal(tPrice);
 				//orderPro.add(orderProduct);
@@ -170,7 +173,8 @@ public class OrdersServiceImpl implements IOrderService {
 					tprice = tprice +(newQuantity * price);
 
 					if (newQuantity == 0) {
-						// orderProRepo.deleteById(prevOrderPro.getProId());
+						//orderProRepo.deleteById(newOrderPro.getId());
+						
 						break;
 					} else {
 						if (newQuantity < oldQuantity) {
@@ -195,10 +199,20 @@ public class OrdersServiceImpl implements IOrderService {
 		Customer cust = byId.get();
 		order.setCustomer(cust);
 		order.setTotalPrice(tprice);
-		order.setStatus("open");
+		
+		if(orders.getStatus().equalsIgnoreCase("close"))
+		{
+			order.setNoOfInstallments(0);
+			order.setOutstandingBal(0);
+			order.setStatus(orders.getStatus());
+			
+		}
+		else
+		{
 		order.setNoOfInstallments(5);
 		order.setOutstandingBal(tprice);
-
+		order.setStatus("open");
+		}
 		return orderRepo.save(order);
 	}
 

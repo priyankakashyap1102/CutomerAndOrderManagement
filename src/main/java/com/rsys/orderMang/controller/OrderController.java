@@ -1,7 +1,7 @@
 package com.rsys.orderMang.controller;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,7 +17,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.rsys.orderMang.ExceptionHandler.OrderIsEmptyException;
 import com.rsys.orderMang.dto.OrderDto;
+import com.rsys.orderMang.entity.OrderProduct;
 import com.rsys.orderMang.entity.Orders;
+import com.rsys.orderMang.repo.OrderProductRepository;
 import com.rsys.orderMang.response.ResponseData;
 import com.rsys.orderMang.service.IOrderService;
 
@@ -28,11 +30,14 @@ public class OrderController {
 
 	@Autowired
 	private IOrderService iOrderService;
+	
+	@Autowired
+	OrderProductRepository orderProductRepository;
 
 	String msg="Following Data Found";
 
 
-	@PostMapping(value = "/{customerId}/order")
+	@PostMapping(value = "/customerId/{customerId}")
 	public ResponseData addOrderDetails(@PathVariable(value = "customerId") int customerId,@RequestBody Orders order)
 	{
 
@@ -43,7 +48,6 @@ public class OrderController {
 		}
 
 		return new ResponseData("200",msg,output);
-
 	}
 
 	@GetMapping
@@ -58,7 +62,7 @@ public class OrderController {
 		return new ResponseData("200",msg,orderDto);
 	}
 
-	@PutMapping(value="/{orderId}/{customerId}")
+	@PutMapping(value="/orderId/customerId/{orderId}/{customerId}")
 	public ResponseData updateOrderDetails(@PathVariable(value = "orderId") int orderId, @PathVariable(value = "customerId") int customerId,@RequestBody Orders order)
 	{
 		
