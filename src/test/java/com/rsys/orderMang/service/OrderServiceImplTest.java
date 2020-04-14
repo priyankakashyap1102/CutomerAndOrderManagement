@@ -161,6 +161,7 @@ public class OrderServiceImplTest {
 
 		pro.setQuantity(10);
 		order.setNoOfInstallments(5);
+		order.setStatus("open");
 
 		cust.setCustomerId(1);
 

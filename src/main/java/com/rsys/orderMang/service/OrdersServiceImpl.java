@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import com.rsys.orderMang.ExceptionHandler.OrderIsEmptyException;
 
@@ -28,7 +26,6 @@ import com.rsys.orderMang.repo.ProductRepository;
 @Service
 public class OrdersServiceImpl implements IOrderService {
 
-	
 	@Autowired
 	OrderRepository orderRepo;
 
@@ -122,12 +119,12 @@ public class OrdersServiceImpl implements IOrderService {
 				orders.setCustomer(cust);
 				orders.setTotalPrice(tPrice);
 				orders.setStatus("open");
-				if(order.getNoOfInstallments()>5)
-				throw new OrderIsEmptyException("Only five installments Allowed");
+				if (order.getNoOfInstallments() > 5)
+					throw new OrderIsEmptyException("Only five installments Allowed");
 				else
-				orders.setNoOfInstallments(order.getNoOfInstallments());
+					orders.setNoOfInstallments(order.getNoOfInstallments());
 				orders.setOutstandingBal(tPrice);
-				//orderPro.add(orderProduct);
+				// orderPro.add(orderProduct);
 				orders.setOrderPro(order.getOrderPro());
 				orderRepo.save(orders);
 				output = "Order details Added";
@@ -141,11 +138,9 @@ public class OrdersServiceImpl implements IOrderService {
 	@Override
 	@Transactional
 	public Orders updateOrders(int orderId, int customerId, Orders orders) {
-		
 
 		Optional<Orders> oId = orderRepo.findById(orderId);
-		if(!oId.isPresent())
-		{
+		if (!oId.isPresent()) {
 			throw new OrderIsEmptyException("Please Provide valid orderId");
 		}
 		Orders order = oId.get();
@@ -153,12 +148,12 @@ public class OrdersServiceImpl implements IOrderService {
 		List<OrderProduct> newProduct = orders.getOrderPro();
 
 		Optional<Customer> byId = customerRepo.findById(customerId);
-		
+
 		if (!byId.isPresent()) {
 			throw new OrderIsEmptyException("Please Provide valid  customerId");
 		}
-		
-		int newQuantity = 0, oldQuantity = 0, tquan = 0, quan = 0;
+
+		int newQuantity = 0, oldQuantity = 0, tquan = 0, quan = 0,flag=0;
 		float price = 0, tprice = 0;
 		for (OrderProduct prevOrderPro : prevProduct) {
 
@@ -170,11 +165,14 @@ public class OrdersServiceImpl implements IOrderService {
 					Product prep = proRepo.getOne(prevOrderPro.getProId());
 					quan = prep.getQuantity();
 					price = prep.getPrice();
-					tprice = tprice +(newQuantity * price);
+					tprice = tprice + (newQuantity * price);
 
 					if (newQuantity == 0) {
-						//orderProRepo.deleteById(newOrderPro.getId());
-						
+						 deleteById(newOrderPro.getId(),orderId,customerId);
+						 tquan = quan + (oldQuantity - newQuantity);
+							prep.setQuantity(tquan);
+							proService.updateProduct(prep);
+						flag=1;
 						break;
 					} else {
 						if (newQuantity < oldQuantity) {
@@ -194,38 +192,87 @@ public class OrdersServiceImpl implements IOrderService {
 
 				}
 			}
+			if(flag==1)
+				break;
 
 		}
+		if(flag==0)
+		{
 		Customer cust = byId.get();
 		order.setCustomer(cust);
 		order.setTotalPrice(tprice);
-		
-		if(orders.getStatus().equalsIgnoreCase("close"))
-		{
+
+		if (orders.getStatus().equalsIgnoreCase("close")) {
 			order.setNoOfInstallments(0);
 			order.setOutstandingBal(0);
 			order.setStatus(orders.getStatus());
-			
+
+		} else {
+			order.setNoOfInstallments(5);
+			order.setOutstandingBal(tprice);
+			order.setStatus("open");
 		}
-		else
-		{
-		order.setNoOfInstallments(5);
-		order.setOutstandingBal(tprice);
-		order.setStatus("open");
 		}
 		return orderRepo.save(order);
 	}
 
 	@Override
 	public String deleteOneOrder(int orderId) {
-		
+
 		Orders order = orderRepo.getOne(orderId);
-		if(order==null)
-		{
-			throw new OrderIsEmptyException("Please Provide valid  orderId");			
+		if (order == null) {
+			throw new OrderIsEmptyException("Please Provide valid  orderId");
 		}
 		orderRepo.deleteById(orderId);
 		return "Deleted Successfully";
+	}
+
+	@Override
+	public Orders deleteById(int id, int orderid, int customerid) {
+		float tp = 0,price=0,newPrice=0;
+		int quantity=0;
+		Optional<Orders> oId = orderRepo.findById(orderid);
+		if (!oId.isPresent()) {
+			throw new OrderIsEmptyException("Please Provide valid orderId");
+		}
+		Orders order = oId.get();
+		tp=order.getTotalPrice();
+		List<OrderProduct> prevProduct = order.getOrderPro();
+
+		Optional<Customer> byId = customerRepo.findById(customerid);
+
+		if (!byId.isPresent()) {
+			throw new OrderIsEmptyException("Please Provide valid  customerId");
+		}
+		Customer cust = byId.get();
+		for(OrderProduct op:prevProduct)
+		{
+			if(op.getId()==id)
+			{
+				quantity=op.getQuantity();
+				Product prep = proRepo.getOne(op.getProId());
+				price=price+(quantity*(prep.getPrice()));
+				newPrice=tp-price;
+				order.setTotalPrice(newPrice);
+				order.setOutstandingBal(newPrice);
+				order.setCustomer(cust);
+				if(newPrice==0)
+				{
+					order.setNoOfInstallments(0);
+					order.setStatus("close");
+				}
+				else
+				{
+					order.setNoOfInstallments(5);
+					order.setStatus("open");
+				}
+				prevProduct.remove(orderProRepo.getOne(id));	
+				order.setOrderPro(prevProduct);
+					break;
+			}
+		}
+			
+		return orderRepo.save(order);
 	}
 
 }
